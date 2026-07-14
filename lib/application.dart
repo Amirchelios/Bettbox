@@ -94,6 +94,8 @@ class ApplicationState extends ConsumerState<Application>
     if (!shouldRun) {
       _autoUpdateGroupTaskTimer?.cancel();
       _autoUpdateGroupTaskTimer = null;
+      _autoUpdateProfilesTaskTimer?.cancel();
+      _autoUpdateProfilesTaskTimer = null;
       return;
     }
     if (_autoUpdateGroupTaskTimer == null) {
@@ -121,7 +123,7 @@ class ApplicationState extends ConsumerState<Application>
 
   void _autoUpdateProfilesTask() {
     _autoUpdateProfilesTaskTimer = Timer.periodic(
-      const Duration(hours: 24),
+      const Duration(hours: 1),
       (_) => unawaited(globalState.appController.autoUpdateProfiles()),
     );
   }

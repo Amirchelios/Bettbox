@@ -408,6 +408,7 @@ class AppController {
   }
 
   Future<void> deleteProfile(String id) async {
+    if (id == defaultProfileId) return;
     _ref.read(profilesProvider.notifier).deleteProfileById(id);
     await clearEffect(id);
     if (globalState.config.currentProfileId == id) {
@@ -456,7 +457,8 @@ class AppController {
   }
 
   void setProfiles(List<Profile> profiles) {
-    _ref.read(profilesProvider.notifier).value = profiles;
+    _ref.read(profilesProvider.notifier).value = profiles
+        .ensureDefaultProfile();
   }
 
   void addLog(Log log) {
@@ -2023,7 +2025,8 @@ class AppController {
       appSettingProvider.select((state) => state.recoveryStrategy),
     );
     if (recoveryStrategy == RecoveryStrategy.override) {
-      _ref.read(profilesProvider.notifier).value = profiles;
+      _ref.read(profilesProvider.notifier).value = profiles
+          .ensureDefaultProfile();
     } else {
       for (final profile in profiles) {
         _ref.read(profilesProvider.notifier).setProfile(profile);

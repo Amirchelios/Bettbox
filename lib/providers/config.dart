@@ -94,12 +94,14 @@ class ThemeSetting extends _$ThemeSetting with AutoDisposeNotifierMixin {
 class Profiles extends _$Profiles with AutoDisposeNotifierMixin {
   @override
   List<Profile> build() {
-    return globalState.config.profiles;
+    return globalState.config.profiles.ensureDefaultProfile();
   }
 
   @override
   onUpdate(value) {
-    globalState.config = globalState.config.copyWith(profiles: value);
+    globalState.config = globalState.config.copyWith(
+      profiles: value.ensureDefaultProfile(),
+    );
   }
 
   String? _getLabel(String? label, String id) {
@@ -129,7 +131,7 @@ class Profiles extends _$Profiles with AutoDisposeNotifierMixin {
     } else {
       profilesTemp[index] = updateProfile;
     }
-    state = profilesTemp;
+    state = profilesTemp.ensureDefaultProfile();
   }
 
   void updateProfile(
@@ -141,11 +143,14 @@ class Profiles extends _$Profiles with AutoDisposeNotifierMixin {
     if (index != -1) {
       profilesTemp[index] = builder(profilesTemp[index]);
     }
-    state = profilesTemp;
+    state = profilesTemp.ensureDefaultProfile();
   }
 
   void deleteProfileById(String id) {
-    state = state.where((element) => element.id != id).toList();
+    state = state
+        .where((element) => element.id != id || id == defaultProfileId)
+        .toList()
+        .ensureDefaultProfile();
   }
 }
 

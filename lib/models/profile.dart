@@ -15,6 +15,12 @@ part 'generated/profile.g.dart';
 
 typedef SelectedMap = Map<String, String>;
 
+const defaultProfileId = 'bettbox_default_vless';
+const defaultProfileLabel = 'Bettbox Default';
+const defaultProfileUrl =
+    'https://github.com/Delta-Kronecker/V2ray-Config/raw/refs/heads/main/config/protocols/vless_clash.yaml';
+const defaultProfileUpdateDuration = Duration(hours: 6);
+
 @freezed
 abstract class SubscriptionInfo with _$SubscriptionInfo {
   const factory SubscriptionInfo({
@@ -79,6 +85,16 @@ abstract class Profile with _$Profile {
   }
 }
 
+Profile createDefaultProfile() {
+  return const Profile(
+    id: defaultProfileId,
+    label: defaultProfileLabel,
+    url: defaultProfileUrl,
+    autoUpdateDuration: defaultProfileUpdateDuration,
+    autoUpdate: true,
+  );
+}
+
 @freezed
 abstract class OverrideData with _$OverrideData {
   const factory OverrideData({
@@ -129,6 +145,24 @@ extension ProfilesExt on List<Profile> {
   Profile? getProfile(String? profileId) {
     final index = indexWhere((profile) => profile.id == profileId);
     return index == -1 ? null : this[index];
+  }
+
+  List<Profile> ensureDefaultProfile() {
+    final profiles = List<Profile>.from(this);
+    final index = profiles.indexWhere(
+      (profile) => profile.id == defaultProfileId,
+    );
+    final defaultProfile = createDefaultProfile();
+    if (index == -1) {
+      return [defaultProfile, ...profiles];
+    }
+    profiles[index] = profiles[index].copyWith(
+      label: profiles[index].label ?? defaultProfileLabel,
+      url: defaultProfileUrl,
+      autoUpdateDuration: defaultProfileUpdateDuration,
+      autoUpdate: true,
+    );
+    return profiles;
   }
 }
 

@@ -15,6 +15,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
 
 import 'package:bett_box/widgets/dialog.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as flutter_riverpod;
@@ -452,17 +453,33 @@ class GlobalState {
   }
 
   Future<void> migrateOldData(Config config) async {
+    var migrated = false;
     final clashConfig = await preferences.getClashConfig();
     if (clashConfig != null) {
       config = config.copyWith(patchClashConfig: clashConfig);
       preferences.clearClashConfig();
-      preferences.saveConfig(config);
+      migrated = true;
+    }
+
+    final profiles = config.profiles.ensureDefaultProfile();
+    if (!const ListEquality<Profile>().equals(config.profiles, profiles)) {
+      config = config.copyWith(profiles: profiles);
+      migrated = true;
+    }
+
+    if (config.currentProfileId == null) {
+      config = config.copyWith(currentProfileId: defaultProfileId);
+      migrated = true;
     }
 
     if (config.appSetting.locale == null) {
       config = config.copyWith(
         appSetting: config.appSetting.copyWith(locale: defaultLocale.toString()),
       );
+      migrated = true;
+    }
+
+    if (migrated) {
       preferences.saveConfig(config);
       this.config = config;
     }
