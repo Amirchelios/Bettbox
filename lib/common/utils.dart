@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lpinyin/lpinyin.dart';
 
+const defaultLocale = Locale('en');
+
 class Utils {
   Color? getDelayColor(int? delay) {
     if (delay == null) return null;
@@ -96,23 +98,18 @@ class Utils {
   Locale getSystemLocale() {
     final platformLocale = WidgetsBinding.instance.platformDispatcher.locale;
     final supportedLocales = AppLocalizations.delegate.supportedLocales;
-    
+
     if (platformLocale.languageCode.toLowerCase() == 'zh') {
-      final isTraditional = 
-        (platformLocale.countryCode?.toUpperCase() == 'TW') ||
-        (platformLocale.countryCode?.toUpperCase() == 'HK') ||
-        (platformLocale.countryCode?.toUpperCase() == 'MO') ||
-        (platformLocale.scriptCode?.toLowerCase() == 'hant');
-      return isTraditional ? const Locale('zh', 'TC') : const Locale('zh', 'CN');
+      return defaultLocale;
     }
-    
+
     for (final locale in supportedLocales) {
       if (locale.languageCode == platformLocale.languageCode) {
         return locale;
       }
     }
-    
-    return const Locale('zh', 'CN');
+
+    return defaultLocale;
   }
 
   Locale? getLocaleForString(String? localString) {

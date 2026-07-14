@@ -460,9 +460,8 @@ class GlobalState {
     }
 
     if (config.appSetting.locale == null) {
-      final systemLocale = utils.getSystemLocale();
       config = config.copyWith(
-        appSetting: config.appSetting.copyWith(locale: systemLocale.toString()),
+        appSetting: config.appSetting.copyWith(locale: defaultLocale.toString()),
       );
       preferences.saveConfig(config);
       this.config = config;
